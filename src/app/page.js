@@ -3,74 +3,91 @@ import React, { useEffect, useState } from 'react'
 
 export default function Page() {
 
-    const words = ["ホゲータ", "クワッス", "ニャオハ"]
-    const [selCom, setSelCom] = useState(0);
-    const [state, setState] = useState("");
+    const words = ["ホゲータ", "ニャオハ", "クワッス", "グソクムシャ"];
+    const [inputVal, setInputVal] = useState("");
+    const [search, setSearch] = useState(words);
+    const [selected, setSelected] = useState(0);
+    const [Typing, setTyping] = useState(false);
+    const [focus, setFocus] = useState();
 
     useEffect(() => {
 
-        const handleEscape = (event) => {
-            if (event.code === "ArrowUp") {
-                setSelCom((selCom) => selCom - 1)
-            }
-            else if (event.code === "ArrowDown") {
-                setSelCom((selCom) => selCom + 1)
-            }
-            else if (event.code === "Enter") {
-                setState(words[selCom])
-            }
-        };
+        setSearch(words.filter((item) => (kanaToHira(item).includes(kanaToHira(inputVal)) && !(kanaToHira(item) === kanaToHira(inputVal)))))
 
-        document.addEventListener('keydown', handleEscape);
+    }, [inputVal, selected])
 
-        return () => {
-            document.removeEventListener('keydown', handleEscape);
-        };
-        
-    }, [selCom]);
-
-    if (selCom === words.length) {
-        setSelCom(0)
+    const handleChange = (e) => {
+        setInputVal(e.target.value)
+        setSelected(0)
     }
 
-    if (selCom === -1) {
-        setSelCom(words.length - 1)
+    const handleEscape = (event) => {
+
+        if (event.code === "ArrowUp") {
+            event.preventDefault()
+            if (search.length === 0) return
+            setSelected((selected) => selected - 1)
+            if (selected === 0) {
+                setSelected(search.length - 1)
+            }
+        }
+        else if (event.code === "ArrowDown") {
+            if (search.length === 0) return
+            setSelected((selected) => selected + 1)
+            if (selected === search.length - 1) {
+                setSelected(0)
+            }
+        }
+        else if (event.code === "Enter" && Typing === false) {
+            if (search.length === 0) return
+            setInputVal(search[selected])
+            setSelected(0)
+        }
+    };
+
+    function kanaToHira(str) {
+        return str.replace(/[\u30a1-\u30f6]/g, function (match) {
+            var chr = match.charCodeAt(0) - 0x60;
+            return String.fromCharCode(chr);
+        });
     }
 
-    const handleClick = (e) => {
-        console.log(e.target.value)
+    function hiraToKana(str) {
+        return str.replace(/[\u3041-\u3096]/g, function (match) {
+            var chr = match.charCodeAt(0) + 0x60;
+            return String.fromCharCode(chr);
+        });
     }
 
     return (
-        <>
-            <input type="text" value={state} onChange={(event) => setState(event.target.value)} style={{ backgroundColor: "", borderRadius: "3px", border: "1px solid #E8EAEE" }} />
-            {words.map((word, index) => {
-                return (
-                    <>
-                        {word.includes(state) ? <p
+        <div style={{ width: "200px" }}>
+            <input
+                type="text"
+                value={inputVal}
+                onKeyDown={(e) => handleEscape(e)}
+                onChange={(e) => handleChange(e)}
+                onFocus={() => setFocus(true)}
+                onBlur={() => {setTimeout(() => {setFocus(false)}, 1)}}
+                style={{ borderRadius: "3px", border: "1px solid #E8EAEE", width: "100%" }}
+                onCompositionStart={() => setTyping(true)}
+                onCompositionEnd={() => setTyping(false)}
+            />
+            {focus ?
+                <div>
+                    {search.map((item, index) => {
+                        return (<p
                             key={index}
+                            onMouseEnter={() => setSelected(index)}
                             onClick={() => {
-                                setSelCom(index)
-                                setState(word)
+                                setInputVal(item)
+                                setSelected(0)
                             }}
-                            onMouseEnter={() => setSelCom(index)}
-                            style={{ backgroundColor: selCom === index ? '#F5F5F5' : 'white' }}>
-                            {word}
-                        </p> : <p></p>}
-                        {/* <p
-                            key={index}
-                            onClick={() => {
-                                setSelCom(index)
-                                setState(word)
-                            }}
-                            onMouseEnter={() => setSelCom(index)}
-                            style={{ backgroundColor: selCom === index ? '#F5F5F5' : 'white' }}>
-                            {word}
-                        </p> */}
-                    </>
-                )
-            })}
-            <p>{selCom}</p>
-        </>
+                            style={{ backgroundColor: selected === index ? '#F5F5F5' : 'white' }}>
+                            {item}
+                        </p>)
+                    })}
+                </div> : <div></div>}
+            <p>{selected}</p>
+        </div>
     )
 }
