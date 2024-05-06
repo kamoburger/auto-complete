@@ -1,7 +1,7 @@
-"use client"
+'use client';
 import React, { useEffect, useState } from 'react'
 
-export default function page() {
+export default function Page() {
 
     const words = ["ホゲータ", "クワッス", "ニャオハ"]
     const [selCom, setSelCom] = useState(0);
