@@ -67,7 +67,7 @@ export default function Page() {
                 onKeyDown={(e) => handleEscape(e)}
                 onChange={(e) => handleChange(e)}
                 onFocus={() => setFocus(true)}
-                onBlur={() => {setTimeout(() => {setFocus(false)}, 1)}}
+                onBlur={() => setFocus(false)}
                 style={{ borderRadius: "3px", border: "1px solid #E8EAEE", width: "100%" }}
                 onCompositionStart={() => setTyping(true)}
                 onCompositionEnd={() => setTyping(false)}
@@ -78,7 +78,7 @@ export default function Page() {
                         return (<p
                             key={index}
                             onMouseEnter={() => setSelected(index)}
-                            onClick={() => {
+                            onMouseDown={() => {
                                 setInputVal(item)
                                 setSelected(0)
                             }}
