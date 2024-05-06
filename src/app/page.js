@@ -8,6 +8,7 @@ export default function Page() {
     const [state, setState] = useState("");
 
     useEffect(() => {
+
         const handleEscape = (event) => {
             if (event.code === "ArrowUp") {
                 setSelCom((selCom) => selCom - 1)
@@ -25,6 +26,7 @@ export default function Page() {
         return () => {
             document.removeEventListener('keydown', handleEscape);
         };
+        
     }, [selCom]);
 
     if (selCom === words.length) {
@@ -41,18 +43,32 @@ export default function Page() {
 
     return (
         <>
-            <input type="text" value={state} onChange={(event) => setState(event.target.value)} style={{backgroundColor: "", borderRadius: "3px", border: "1px solid #E8EAEE"}}/>
+            <input type="text" value={state} onChange={(event) => setState(event.target.value)} style={{ backgroundColor: "", borderRadius: "3px", border: "1px solid #E8EAEE" }} />
             {words.map((word, index) => {
-                return (<p
-                    key={index}
-                    onClick={() => {
-                        setSelCom(index)
-                        setState(word)
-                    }}
-                    onMouseEnter={() => setSelCom(index)}
-                    style={{ backgroundColor: selCom === index ? '#F5F5F5' : 'white' }}>
-                    {word}
-                </p>)
+                return (
+                    <>
+                        {word.includes(state) ? <p
+                            key={index}
+                            onClick={() => {
+                                setSelCom(index)
+                                setState(word)
+                            }}
+                            onMouseEnter={() => setSelCom(index)}
+                            style={{ backgroundColor: selCom === index ? '#F5F5F5' : 'white' }}>
+                            {word}
+                        </p> : <p></p>}
+                        {/* <p
+                            key={index}
+                            onClick={() => {
+                                setSelCom(index)
+                                setState(word)
+                            }}
+                            onMouseEnter={() => setSelCom(index)}
+                            style={{ backgroundColor: selCom === index ? '#F5F5F5' : 'white' }}>
+                            {word}
+                        </p> */}
+                    </>
+                )
             })}
             <p>{selCom}</p>
         </>
