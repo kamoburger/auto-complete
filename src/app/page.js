@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 export default function Page() {
 
@@ -9,6 +9,8 @@ export default function Page() {
     const [selected, setSelected] = useState(0);
     const [Typing, setTyping] = useState(false);
     const [focus, setFocus] = useState();
+    const [isCorrect, setIsCorrect] = useState();
+    const input = useRef()
 
     useEffect(() => {
 
@@ -39,9 +41,13 @@ export default function Page() {
             }
         }
         else if (event.code === "Enter" && Typing === false) {
-            if (search.length === 0) return
-            setInputVal(search[selected])
-            setSelected(0)
+            if (search.length === 0) {
+                input.current.blur()
+            } else {
+                setInputVal(search[selected])
+                setSelected(0)
+                input.current.blur()
+            }
         }
     };
 
@@ -59,15 +65,30 @@ export default function Page() {
         });
     }
 
+    const handleBlur = () => {
+        setFocus(false)
+        if (search.length === 0 && !(inputVal === "")) {
+            setInputVal("")
+        } else {
+            setInputVal(search[selected])
+            setSelected(0)
+        }
+        console.log("blur")
+    }
+
     return (
         <div style={{ width: "200px" }}>
             <input
                 type="text"
+                ref={input}
                 value={inputVal}
                 onKeyDown={(e) => handleEscape(e)}
                 onChange={(e) => handleChange(e)}
-                onFocus={() => setFocus(true)}
-                onBlur={() => setFocus(false)}
+                onFocus={() => {
+                    setFocus(true)
+                    setIsCorrect(false)
+                }}
+                onBlur={() => handleBlur()}
                 style={{ borderRadius: "3px", border: "1px solid #E8EAEE", width: "100%" }}
                 onCompositionStart={() => setTyping(true)}
                 onCompositionEnd={() => setTyping(false)}
@@ -80,7 +101,8 @@ export default function Page() {
                             onMouseEnter={() => setSelected(index)}
                             onMouseDown={() => {
                                 setInputVal(item)
-                                setSelected(0)
+                                setSelected(index)
+                                console.log("clicked")
                             }}
                             style={{ backgroundColor: selected === index ? '#F5F5F5' : 'white' }}>
                             {item}
