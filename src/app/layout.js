@@ -12,10 +12,18 @@ export default function RootLayout({ children }) {
     return (
         <html lang="ja">
             <head>
-                <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
                 <title>【開発中】オートコンプリート</title>
             </head>
             <body className={inter.className}>{children}</body>
         </html>
     );
 }
+
+const touchHandler = (event) => {
+    if (event.touches.length > 1) {
+      event.preventDefault();
+    }
+  };
+  document.addEventListener('touchstart', touchHandler, {
+    passive: false
+  });
