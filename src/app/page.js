@@ -10,6 +10,7 @@ export default function Page() {
     const [Typing, setTyping] = useState(false);
     const [focus, setFocus] = useState();
     const [isCorrect, setIsCorrect] = useState();
+    const [optionClicked, setOptionClicked] = useState(false);
     const input = useRef()
 
     useEffect(() => {
@@ -41,13 +42,42 @@ export default function Page() {
             }
         }
         else if (event.code === "Enter" && Typing === false) {
-            if (search.length === 0) {
-                input.current.blur()
+
+            input.current.blur()
+            console.log(inputVal)
+
+            let data = []
+            words.map((item) => {
+                if (item === inputVal || item === search[selected])
+                data = [...data, item]
+            })
+            if (data.length !== 0) {
+                if (search[selected]) {
+                    setInputVal(search[selected])
+                } else {
+                    setInputVal(inputVal)
+                }
             } else {
-                setInputVal(search[selected])
-                setSelected(0)
-                input.current.blur()
+                    setInputVal("")
+                
+                console.log(search[selected])
             }
+
+            console.log("enter")
+            setSelected(0)
+
+            // let data = []
+            // words.map((item) => {
+            //     if (item === inputVal)
+            //     data = [...data, item]
+            // })
+            // if (data.length !== 0) {
+            //     setInputVal(search[selected])
+            // } else {
+            //     setInputVal("")
+            // }
+            // console.log(data)
+            // input.current.blur()
         }
     };
 
@@ -67,13 +97,17 @@ export default function Page() {
 
     const handleBlur = () => {
         setFocus(false)
-        if (search.length === 0 && !(inputVal === "")) {
-            setInputVal("")
+        let data = []
+        words.map((item) => {
+            if (item === inputVal)
+            data = [...data, item]
+        })
+        if (data.length !== 0) {
+            return
         } else {
-            setInputVal(search[selected])
-            setSelected(0)
+            setInputVal("")
         }
-        console.log("blur")
+        console.log(data)
     }
 
     return (
@@ -101,7 +135,7 @@ export default function Page() {
                             onMouseEnter={() => setSelected(index)}
                             onMouseDown={() => {
                                 setInputVal(item)
-                                setSelected(index)
+                                setOptionClicked(true)
                                 console.log("clicked")
                             }}
                             style={{ backgroundColor: selected === index ? '#F5F5F5' : 'white' }}>
