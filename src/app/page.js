@@ -130,7 +130,7 @@ export default function Page() {
                                 setFocus(true)
                             }}
                             onBlur={() => handleBlur()}
-                            style={{ borderRadius: "3px", width: widthByRef, maxWidth: "100%", minWidth: "1px", height: "18px", overflow: "hidden", margin: "3px" }}
+                            style={{ fontSize: "16px", borderRadius: "3px", width: widthByRef, maxWidth: "100%", minWidth: "1px", height: "18px", overflow: "hidden", margin: "3px" }}
                             onCompositionStart={() => setTyping(true)}
                             onCompositionEnd={() => setTyping(false)}
                         />
@@ -162,7 +162,7 @@ export default function Page() {
                         })}
                         {search.length === 0 ? <p style={{ backgroundColor: 'white', padding: "10px 14px", color: "#A2A2A2" }}>No options</p> : <p></p>}
                     </div> : <div></div>}
-                <span ref={length} style={{ visibility: "hidden", position: "absolute" }}>{inputVal}</span>
+                <span ref={length} style={{ visibility: "hidden", position: "absolute", fontSize: "16px" }}>{inputVal}</span>
             </div>
             <div style={{ margin: "24px", fontSize: "1.0rem" }}>
                 {resultArray.map((item, index) => {
