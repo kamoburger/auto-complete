@@ -413,3 +413,7 @@ th {
   text-align: left;
   font-weight: bold;
 }
+
+input:focus {
+    outline: none;
+}
