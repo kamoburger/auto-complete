@@ -134,7 +134,6 @@ export default function Page() {
     }
 
     const handleBlur = () => {
-        setFocus(false)
         let data = []
         words.map((item) => {
             if (item === inputVal)
@@ -147,21 +146,28 @@ export default function Page() {
             setInputVal("")
         }
         setSelected(0)
+        setFocus(false)
     }
 
     return (
         <main style={{ color: "#757575", fontSize: "64.5%", fontFamily: "Segoe UI', Tahoma, Geneva, Verdana, sans-serif" }}>
             <div style={{ position: "relative", fontSize: "0.9rem" }}>
-                <div style={{ minHeight: "52px", paddingRight: "60px", paddingLeft: "7px", paddingTop: "7px", paddingBottom: "7px", flexWrap: "wrap", margin: "24px", border: "1px solid #C4C4C4", borderRadius: "4px", display: "flex", alignItems: "center" }} onClick={() => input.current.focus()}>
+                <div style={{ minHeight: "52px", paddingRight: "60px", paddingLeft: "7px", paddingTop: "7px", paddingBottom: "7px", flexWrap: "wrap", margin: "24px", border: "1px solid #C4C4C4", borderRadius: "4px", display: "flex", alignItems: "center" }} onClick={() => {
+                    if (trash) {
+                        setTrash(false)
+                    } else {
+                        input.current.focus()
+                    }
+                }}>
                     <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center" }}>
                         {resultArray.map((item, index) => {
                             return (
                                 <div key={index} style={{ margin: "3px", paddingLeft: "10px", paddingRight: "8px", paddingTop: "6px", paddingBottom: "6px", backgroundColor: "#EBEBEB", borderRadius: "20px", display: "flex", alignItems: "center" }}>
                                     <p style={{ color: "#1E1E1E", fontSize: "0.8rem" }}>{item}</p>
                                     <FontAwesomeIcon onMouseDown={() => {
-                                        setTrash(true)
+                                        input.current.blur()
                                         setResultArray(resultArray.filter((data) => (data !== item)))
-                                        console.log("aaa")
+                                        setTrash(true)
                                     }} icon={faXmark} style={{ marginLeft: "8px", backgroundColor: "#AEAEAE", color: "#EBEBEB", fontSize: "1.0rem", paddingRight: "3px", paddingLeft: "3px", paddingTop: "1px", paddingBottom: "1px", borderRadius: "20px" }} />
                                 </div>
                             )
@@ -175,10 +181,6 @@ export default function Page() {
                                 onChange={(e) => handleChange(e)}
                                 onFocus={() => {
                                     setFocus(true)
-                                    if (trash) {
-                                        input.current.blur()
-                                        setTrash(false)
-                                    }
                                 }}
                                 onBlur={() => handleBlur()}
                                 style={{ fontSize: "16px", borderRadius: "3px", width: widthByRef, maxWidth: "100%", minWidth: 1, height: "100%", overflow: "hidden" }}
@@ -190,6 +192,7 @@ export default function Page() {
                     </div>
                     <div style={{ position: "absolute", right: "38px" }}>
                         {focus ? <FontAwesomeIcon icon={faXmark} style={{ fontSize: "1.2rem" }} onMouseDown={() => {
+                            input.current.focus()
                             setInputVal("")
                             setResultArray(resultArray.filter((item) => (item === "")))
                         }} /> : <p></p>}
