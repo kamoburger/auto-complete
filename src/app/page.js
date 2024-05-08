@@ -2,6 +2,7 @@
 import { faAngleDown, faCaretDown, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useEffect, useRef, useState } from 'react'
+import sx from "./page.module.css"
 
 export default function Page() {
 
@@ -13,6 +14,7 @@ export default function Page() {
     const [Typing, setTyping] = useState(false);
     const [focus, setFocus] = useState();
     const [trash, setTrash] = useState(false);
+    const [isHover, setIsHover] = useState(false)
     const [widthByRef, setWidthByRef] = useState();
     const input = useRef();
     const length = useRef();
@@ -167,12 +169,20 @@ export default function Page() {
                                     <FontAwesomeIcon onMouseDown={() => {
                                         input.current.blur()
                                         setResultArray(resultArray.filter((data) => (data !== item)))
-                                        setTrash(true)
+                                        if (!(index + 1 === resultArray.length)) {
+                                            setTrash(true)
+                                        } else {
+                                            return
+                                        }
+                                    }} onMouseEnter={() => {
+                                        setIsHover(true)
+                                    }} onMouseLeave={() => {
+                                        setIsHover(false)
                                     }} icon={faXmark} style={{ marginLeft: "8px", backgroundColor: "#AEAEAE", color: "#EBEBEB", fontSize: "1.0rem", paddingRight: "3px", paddingLeft: "3px", paddingTop: "1px", paddingBottom: "1px", borderRadius: "20px" }} />
                                 </div>
                             )
                         })}
-                        <div style={{height: "30px", position: "relative", margin: "3px 3px 3px 6px", display: "flex", alignItems: "center", minWidth: "112px"}}>
+                        <div style={{ height: "30px", position: "relative", margin: "3px 3px 3px 6px", display: "flex", alignItems: "center", minWidth: "112px" }}>
                             <input
                                 type="text"
                                 ref={input}
@@ -187,7 +197,7 @@ export default function Page() {
                                 onCompositionStart={() => setTyping(true)}
                                 onCompositionEnd={() => setTyping(false)}
                             />
-                            {inputVal === "" ? <p ref={placeHolder} style={{position: "absolute", whiteSpace: "nowrap", left: "0", top: "50%", transform: "translateY(-50%)", fontSize: "16px", color: "#A2A2A2"}}>ポケモンを検索</p> : <p></p>}
+                            {inputVal === "" ? <p ref={placeHolder} style={{ position: "absolute", whiteSpace: "nowrap", left: "0", top: "50%", transform: "translateY(-50%)", fontSize: "16px", color: "#A2A2A2" }}>ポケモンを検索</p> : <p></p>}
                         </div>
                     </div>
                     <div style={{ position: "absolute", right: "38px" }}>
@@ -199,23 +209,23 @@ export default function Page() {
                         <FontAwesomeIcon icon={faAngleDown} style={{ marginLeft: "12px", transform: focus ? "rotate(180deg)" : "rotate(0deg)" }} />
                     </div>
                 </div>
-                    {focus ? <div ref={scroll} style={{ maxHeight: "308px", overflow: "scroll", width: "calc(100% - 48px)", backgroundColor: "#FFFFFF", padding: "6px 0px", position: "absolute", bottom: "0px", left: "50%", transform: "translate(-50%, 100%)", margin: "auto", borderRadius: "4px", boxShadow: "0px 0px 2px 1px rgba(148, 148, 148, 0.45)" }}>
-                        {search.map((item, index) => {
-                            return (<>
-                                {!resultArray.includes(item) || resultArray.length === 0 ? <div
-                                    key={index}
-                                    onMouseEnter={() => setSelected(index)}
-                                    onMouseDown={() => {
-                                        setInputVal("")
-                                        setResultArray([...resultArray, item])
-                                    }}
-                                    style={{ backgroundColor: selected === index ? '#F5F5F5' : 'white', height: "37px", display: "flex", alignItems: "center"}}>
-                                        <p style={{marginLeft: "14px"}}>{item}</p>
-                                </div> : <div></div>}
-                            </>)
-                        })}
-                        {search.length === 0 ? <p style={{ backgroundColor: 'white', padding: "10px 14px", color: "#A2A2A2" }}>No options</p> : <p></p>}
-                    </div> : <div></div>}
+                {focus ? <div ref={scroll} style={{ maxHeight: "308px", overflow: "scroll", width: "calc(100% - 48px)", backgroundColor: "#FFFFFF", padding: "6px 0px", position: "absolute", bottom: "0px", left: "50%", transform: "translate(-50%, 100%)", margin: "auto", borderRadius: "4px", boxShadow: "0px 0px 2px 1px rgba(148, 148, 148, 0.45)" }}>
+                    {search.map((item, index) => {
+                        return (<>
+                            {!resultArray.includes(item) || resultArray.length === 0 ? <div
+                                key={index}
+                                onMouseEnter={() => setSelected(index)}
+                                onMouseDown={() => {
+                                    setInputVal("")
+                                    setResultArray([...resultArray, item])
+                                }}
+                                style={{ backgroundColor: selected === index ? '#F5F5F5' : 'white', height: "37px", display: "flex", alignItems: "center" }}>
+                                <p style={{ marginLeft: "14px" }}>{item}</p>
+                            </div> : <div></div>}
+                        </>)
+                    })}
+                    {search.length === 0 ? <p style={{ backgroundColor: 'white', padding: "10px 14px", color: "#A2A2A2" }}>No options</p> : <p></p>}
+                </div> : <div></div>}
                 <span ref={length} style={{ visibility: "hidden", position: "absolute", fontSize: "16px" }}>{inputVal}</span>
             </div>
             <div style={{ margin: "24px", fontSize: "1.0rem" }}>
