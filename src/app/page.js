@@ -12,10 +12,8 @@ export default function Page() {
     const [selected, setSelected] = useState(0);
     const [Typing, setTyping] = useState(false);
     const [focus, setFocus] = useState();
-    const [deleted, setDelated] = useState(false);
-    const [clicked, setCliked] = useState(false)
+    const [trash, setTrash] = useState(false);
     const [widthByRef, setWidthByRef] = useState();
-    const [holder, setHolder] = useState();
     const input = useRef();
     const length = useRef();
     const placeHolder = useRef();
@@ -25,7 +23,6 @@ export default function Page() {
 
         setSearch(words.filter((item) => (kanaToHira(item).includes(kanaToHira(inputVal)) && !(kanaToHira(item) === kanaToHira(inputVal)) && !resultArray.includes(item))))
         setWidthByRef(length.current ? length.current.offsetWidth : 0);
-        setHolder(placeHolder.current ? placeHolder.current.offsetWidth : 1)
 
     }, [inputVal, selected, resultArray])
 
@@ -150,7 +147,6 @@ export default function Page() {
             setInputVal("")
         }
         setSelected(0)
-        setDelated(false)
     }
 
     return (
@@ -163,9 +159,9 @@ export default function Page() {
                                 <div key={index} style={{ margin: "3px", paddingLeft: "10px", paddingRight: "8px", paddingTop: "6px", paddingBottom: "6px", backgroundColor: "#EBEBEB", borderRadius: "20px", display: "flex", alignItems: "center" }}>
                                     <p style={{ color: "#1E1E1E", fontSize: "0.8rem" }}>{item}</p>
                                     <FontAwesomeIcon onMouseDown={() => {
+                                        setTrash(true)
                                         setResultArray(resultArray.filter((data) => (data !== item)))
                                         console.log("aaa")
-                                        input.current.blur()
                                     }} icon={faXmark} style={{ marginLeft: "8px", backgroundColor: "#AEAEAE", color: "#EBEBEB", fontSize: "1.0rem", paddingRight: "3px", paddingLeft: "3px", paddingTop: "1px", paddingBottom: "1px", borderRadius: "20px" }} />
                                 </div>
                             )
@@ -179,6 +175,10 @@ export default function Page() {
                                 onChange={(e) => handleChange(e)}
                                 onFocus={() => {
                                     setFocus(true)
+                                    if (trash) {
+                                        input.current.blur()
+                                        setTrash(false)
+                                    }
                                 }}
                                 onBlur={() => handleBlur()}
                                 style={{ fontSize: "16px", borderRadius: "3px", width: widthByRef, maxWidth: "100%", minWidth: 1, height: "100%", overflow: "hidden" }}
@@ -190,10 +190,8 @@ export default function Page() {
                     </div>
                     <div style={{ position: "absolute", right: "38px" }}>
                         {focus ? <FontAwesomeIcon icon={faXmark} style={{ fontSize: "1.2rem" }} onMouseDown={() => {
-                            input.current.focus()
                             setInputVal("")
                             setResultArray(resultArray.filter((item) => (item === "")))
-                            setDelated(true)
                         }} /> : <p></p>}
                         <FontAwesomeIcon icon={faAngleDown} style={{ marginLeft: "12px", transform: focus ? "rotate(180deg)" : "rotate(0deg)" }} />
                     </div>
@@ -207,7 +205,6 @@ export default function Page() {
                                     onMouseDown={() => {
                                         setInputVal("")
                                         setResultArray([...resultArray, item])
-                                        setCliked(true)
                                     }}
                                     style={{ backgroundColor: selected === index ? '#F5F5F5' : 'white', height: "37px", display: "flex", alignItems: "center"}}>
                                         <p style={{marginLeft: "14px"}}>{item}</p>
