@@ -13,20 +13,61 @@ export default function Page() {
     const [Typing, setTyping] = useState(false);
     const [focus, setFocus] = useState();
     const [deleted, setDelated] = useState(false);
-    let [widthByRef, setWidthByRef] = useState(200);
-    const input = useRef()
-    const length = useRef()
+    const [clicked, setCliked] = useState(false)
+    const [widthByRef, setWidthByRef] = useState();
+    const [holder, setHolder] = useState();
+    const input = useRef();
+    const length = useRef();
+    const placeHolder = useRef();
+    const scroll = useRef();
 
     useEffect(() => {
 
-        setSearch(words.filter((item) => (kanaToHira(item).includes(kanaToHira(inputVal)) && !(kanaToHira(item) === kanaToHira(inputVal)))))
+        setSearch(words.filter((item) => (kanaToHira(item).includes(kanaToHira(inputVal)) && !(kanaToHira(item) === kanaToHira(inputVal)) && !resultArray.includes(item))))
         setWidthByRef(length.current ? length.current.offsetWidth : 0);
+        setHolder(placeHolder.current ? placeHolder.current.offsetWidth : 1)
 
-    }, [inputVal, selected])
+    }, [inputVal, selected, resultArray])
 
     const handleChange = (e) => {
         setInputVal(e.target.value)
         setSelected(0)
+    }
+
+    const handleUpScroll = () => {
+        const elm = scroll.current
+        const frameTop = elm.scrollTop
+        const frameBottom = elm.scrollTop + elm.clientHeight
+        const optionTop = 37 * selected
+        const optionBottom = 37 * (selected + 1)
+        if (frameTop + 37 > optionTop) {
+            elm.scrollTo(0, 37 * (selected - 1))
+        }
+        if (frameBottom < optionBottom) {
+            elm.scrollTo(0, 37 * (selected - 1))
+        }
+        if (selected === 0) {
+            elm.scrollTo(0, 10000)
+        }
+        // console.log(frameTop, frameBottom, optionTop, optionBottom)
+    }
+
+    const handleDownScroll = () => {
+        const elm = scroll.current
+        const frameTop = elm.scrollTop
+        const frameBottom = elm.scrollTop + elm.clientHeight
+        const optionTop = 37 * selected
+        const optionBottom = 37 * (selected + 1)
+        if (frameBottom - 37 < optionBottom) {
+            elm.scrollTo(0, 37 * (selected - 6))
+        }
+        if (frameTop > optionTop) {
+            elm.scrollTo(0, 37 * (selected - 6))
+        }
+        if (selected === search.length - 1) {
+            elm.scrollTo(0, 0)
+        }
+        // console.log(frameTop, frameBottom, optionTop, optionBottom)
     }
 
     const handleEscape = (event) => {
@@ -38,12 +79,18 @@ export default function Page() {
             if (selected === 0) {
                 setSelected(search.length - 1)
             }
+            if (focus) {
+                handleUpScroll()
+            }
         }
         else if (event.code === "ArrowDown") {
             if (search.length === 0) return
             setSelected((selected) => selected + 1)
             if (selected === search.length - 1) {
                 setSelected(0)
+            }
+            if (focus) {
+                handleDownScroll()
             }
         }
         else if (event.code === "Enter" && Typing === false) {
@@ -68,7 +115,10 @@ export default function Page() {
             }
 
             setSelected(0)
-
+        } else if (event.code === "Backspace") {
+            if (inputVal === "" && resultArray.length !== 0) {
+                setResultArray(resultArray.filter((item, index) => (index !== (resultArray.length - 1))))
+            }
         }
     };
 
@@ -100,15 +150,11 @@ export default function Page() {
             setInputVal("")
         }
         setSelected(0)
-        if (deleted) {
-            input.current.focus()
-        }
         setDelated(false)
-        console.log("blur")
     }
 
     return (
-        <main style={{ height: "100vh", color: "#757575", fontSize: "64.5%", fontFamily: "Segoe UI', Tahoma, Geneva, Verdana, sans-serif" }}>
+        <main style={{ color: "#757575", fontSize: "64.5%", fontFamily: "Segoe UI', Tahoma, Geneva, Verdana, sans-serif" }}>
             <div style={{ position: "relative", fontSize: "0.9rem" }}>
                 <div style={{ minHeight: "52px", paddingRight: "60px", paddingLeft: "7px", paddingTop: "7px", paddingBottom: "7px", flexWrap: "wrap", margin: "24px", border: "1px solid #C4C4C4", borderRadius: "4px", display: "flex", alignItems: "center" }} onClick={() => input.current.focus()}>
                     <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center" }}>
@@ -116,24 +162,31 @@ export default function Page() {
                             return (
                                 <div key={index} style={{ margin: "3px", paddingLeft: "10px", paddingRight: "8px", paddingTop: "6px", paddingBottom: "6px", backgroundColor: "#EBEBEB", borderRadius: "20px", display: "flex", alignItems: "center" }}>
                                     <p style={{ color: "#1E1E1E", fontSize: "0.8rem" }}>{item}</p>
-                                    <FontAwesomeIcon icon={faXmark} style={{ marginLeft: "8px", backgroundColor: "#AEAEAE", color: "#EBEBEB", fontSize: "1.0rem", paddingRight: "3px", paddingLeft: "3px", paddingTop: "1px", paddingBottom: "1px", borderRadius: "20px" }} />
+                                    <FontAwesomeIcon onMouseDown={() => {
+                                        setResultArray(resultArray.filter((data) => (data !== item)))
+                                        console.log("aaa")
+                                        input.current.blur()
+                                    }} icon={faXmark} style={{ marginLeft: "8px", backgroundColor: "#AEAEAE", color: "#EBEBEB", fontSize: "1.0rem", paddingRight: "3px", paddingLeft: "3px", paddingTop: "1px", paddingBottom: "1px", borderRadius: "20px" }} />
                                 </div>
                             )
                         })}
-                        <input
-                            type="text"
-                            ref={input}
-                            value={inputVal}
-                            onKeyDown={(e) => handleEscape(e)}
-                            onChange={(e) => handleChange(e)}
-                            onFocus={() => {
-                                setFocus(true)
-                            }}
-                            onBlur={() => handleBlur()}
-                            style={{ fontSize: "16px", borderRadius: "3px", width: widthByRef, maxWidth: "100%", minWidth: "1px", height: "18px", overflow: "hidden", margin: "3px" }}
-                            onCompositionStart={() => setTyping(true)}
-                            onCompositionEnd={() => setTyping(false)}
-                        />
+                        <div style={{height: "30px", position: "relative", margin: "3px 3px 3px 6px", display: "flex", alignItems: "center", minWidth: "112px"}}>
+                            <input
+                                type="text"
+                                ref={input}
+                                value={inputVal}
+                                onKeyDown={(e) => handleEscape(e)}
+                                onChange={(e) => handleChange(e)}
+                                onFocus={() => {
+                                    setFocus(true)
+                                }}
+                                onBlur={() => handleBlur()}
+                                style={{ fontSize: "16px", borderRadius: "3px", width: widthByRef, maxWidth: "100%", minWidth: 1, height: "100%", overflow: "hidden" }}
+                                onCompositionStart={() => setTyping(true)}
+                                onCompositionEnd={() => setTyping(false)}
+                            />
+                            {inputVal === "" ? <p ref={placeHolder} style={{position: "absolute", whiteSpace: "nowrap", left: "0", top: "50%", transform: "translateY(-50%)", fontSize: "16px", color: "#A2A2A2"}}>ポケモンを検索</p> : <p></p>}
+                        </div>
                     </div>
                     <div style={{ position: "absolute", right: "38px" }}>
                         {focus ? <FontAwesomeIcon icon={faXmark} style={{ fontSize: "1.2rem" }} onMouseDown={() => {
@@ -141,24 +194,25 @@ export default function Page() {
                             setInputVal("")
                             setResultArray(resultArray.filter((item) => (item === "")))
                             setDelated(true)
-                            console.log("clicked")
                         }} /> : <p></p>}
                         <FontAwesomeIcon icon={faAngleDown} style={{ marginLeft: "12px", transform: focus ? "rotate(180deg)" : "rotate(0deg)" }} />
                     </div>
                 </div>
-                {focus ?
-                    <div style={{ width: "calc(100% - 48px)", padding: "6px 0px", position: "absolute", bottom: "0px", left: "50%", transform: "translate(-50%, 100%)", margin: "auto", borderRadius: "4px", boxShadow: "0px 0px 2px 1px rgba(148, 148, 148, 0.45)" }}>
+                    {focus ? <div ref={scroll} style={{ maxHeight: "308px", overflow: "scroll", width: "calc(100% - 48px)", backgroundColor: "#FFFFFF", padding: "6px 0px", position: "absolute", bottom: "0px", left: "50%", transform: "translate(-50%, 100%)", margin: "auto", borderRadius: "4px", boxShadow: "0px 0px 2px 1px rgba(148, 148, 148, 0.45)" }}>
                         {search.map((item, index) => {
-                            return (<p
-                                key={index}
-                                onMouseEnter={() => setSelected(index)}
-                                onMouseDown={() => {
-                                    setInputVal("")
-                                    setResultArray([...resultArray, item])
-                                }}
-                                style={{ backgroundColor: selected === index ? '#F5F5F5' : 'white', padding: "10px 14px" }}>
-                                {item}
-                            </p>)
+                            return (<>
+                                {!resultArray.includes(item) || resultArray.length === 0 ? <div
+                                    key={index}
+                                    onMouseEnter={() => setSelected(index)}
+                                    onMouseDown={() => {
+                                        setInputVal("")
+                                        setResultArray([...resultArray, item])
+                                        setCliked(true)
+                                    }}
+                                    style={{ backgroundColor: selected === index ? '#F5F5F5' : 'white', height: "37px", display: "flex", alignItems: "center"}}>
+                                        <p style={{marginLeft: "14px"}}>{item}</p>
+                                </div> : <div></div>}
+                            </>)
                         })}
                         {search.length === 0 ? <p style={{ backgroundColor: 'white', padding: "10px 14px", color: "#A2A2A2" }}>No options</p> : <p></p>}
                     </div> : <div></div>}
